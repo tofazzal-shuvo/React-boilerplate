@@ -1,5 +1,10 @@
 const path = require('path');
-module.exports = {
+const MiniCssExtractPlugin  = require("mini-css-extract-plugin");
+module.exports = (env)=>{
+  console.log('env:', env);
+  const isProduction = env === 'production';
+  // const CSSExtract = new ExtracTextPlugin('styles.css');
+  return {
     mode: 'development',
     entry: './src/app.js',
     output:{
@@ -11,20 +16,29 @@ module.exports = {
           loader: 'babel-loader',
           test: /\.js$/,
           exclude: /node_modules/
-        }, {
+        }, 
+        {
           test: /\.s?css$/,
           use: [
-            'style-loader',
-            'css-loader',
-            'sass-loader'
+            {
+              loader: MiniCssExtractPlugin.loader,
+              
+            },
+            'css-loader', 'scss-loader'
           ]
         }]
-      },
-    devtool: 'cheap-module-eval-source-map',
+    },
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: "styles.css"
+      }),
+    ],
+    devtool: isProduction  ? 'source-map' : 'cheap-module-eval-source-map',
     devServer:{
         historyApiFallback: true,
         contentBase: path.join(__dirname, 'public')
     }
+}
 }
 // babel-core => allow to run babel from any tool like webpack
 // babel-loader => teach webpack how to handle .js files
